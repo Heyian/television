@@ -447,7 +447,7 @@ mod tests {
         default_config.ui.ui_scale = 40;
         default_config.ui.theme = "television".to_string();
         // the fixture sets an explicit prompt (the built-in default is none)
-        default_config.ui.input_bar.prompt = Some(">".to_string());
+        default_config.ui.input_bar.prompt = ">".to_string();
         // With new architecture, we add directly to the bindings map
         default_config.keybindings.insert(
             Key::new(KeyCode::Enter, KeyModifiers::CONTROL),
@@ -493,7 +493,7 @@ mod tests {
         let config = Config::new(&config_env, None).unwrap();
 
         // Verify that input_prompt was loaded from user config
-        assert_eq!(config.ui.input_bar.prompt, Some("❯".to_string()));
+        assert_eq!(config.ui.input_bar.prompt, "❯");
     }
 
     #[test]

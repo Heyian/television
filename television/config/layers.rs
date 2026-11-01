@@ -250,13 +250,13 @@ impl ConfigLayers {
             .input_header
             .clone()
             .or_else(|| channel_input_bar?.header.clone())
-            .or_else(|| self.base_config.ui.input_bar.header.clone());
+            .unwrap_or_else(|| self.base_config.ui.input_bar.header.clone());
         let input_bar_prompt = self
             .channel_cli
             .input_prompt
             .clone()
             .or_else(|| channel_input_bar?.prompt.clone())
-            .or_else(|| self.base_config.ui.input_bar.prompt.clone());
+            .unwrap_or_else(|| self.base_config.ui.input_bar.prompt.clone());
         let input_bar_border_type = self
             .channel_cli
             .input_border
@@ -604,8 +604,8 @@ pub struct MergedConfig {
     pub width: Option<u16>,
     // input bar
     pub input_bar_position: InputPosition,
-    pub input_bar_header: Option<String>,
-    pub input_bar_prompt: Option<String>,
+    pub input_bar_header: String,
+    pub input_bar_prompt: String,
     pub input_bar_border_type: BorderType,
     pub input_bar_padding: Padding,
     /// Show the channel name next to the result count (minimal UI preset).
@@ -688,7 +688,7 @@ impl MergedConfig {
 
     /// An empty input bar header means "no header line at all".
     pub fn input_bar_header_hidden(&self) -> bool {
-        self.input_bar_header.as_deref().is_some_and(str::is_empty)
+        self.input_bar_header.is_empty()
     }
 
     /// Number of vertical cells the results block chrome (borders + padding)
@@ -842,9 +842,8 @@ mod tests {
             assert_eq!(merged.input_bar_border_type, BorderType::None);
             assert_eq!(merged.results_panel_border_type, BorderType::None);
             assert_eq!(merged.preview_panel_border_type, BorderType::None);
-            assert_eq!(merged.input_bar_header.as_deref(), Some(""));
             assert!(merged.input_bar_header_hidden());
-            assert_eq!(merged.input_bar_prompt.as_deref(), Some(""));
+            assert!(merged.input_bar_prompt.is_empty());
             assert_eq!(merged.input_bar_padding, Padding::new(0, 1, 1, 0));
             assert_eq!(merged.results_panel_padding, Padding::new(0, 0, 1, 0));
             assert_eq!(merged.preview_panel_padding, Padding::new(1, 0, 0, 0));
@@ -868,7 +867,7 @@ mod tests {
         assert_eq!(merged.results_panel_border_type, BorderType::None);
         assert_eq!(merged.preview_panel_border_type, BorderType::None);
         assert!(merged.input_bar_header_hidden());
-        assert_eq!(merged.input_bar_prompt.as_deref(), Some(""));
+        assert!(merged.input_bar_prompt.is_empty());
         assert!(merged.input_bar_minimal);
         // ...but the status bar stays
         assert!(!merged.status_bar_hidden);
@@ -992,7 +991,7 @@ mod tests {
         );
         assert!(!merged.status_bar_hidden);
         assert_eq!(merged.preview_panel_border_type, BorderType::Rounded);
-        assert_eq!(merged.input_bar_header.as_deref(), Some("Custom"));
+        assert_eq!(merged.input_bar_header, "Custom");
         // fields the CLI didn't touch still get the preset
         assert_eq!(merged.results_panel_border_type, BorderType::None);
     }
