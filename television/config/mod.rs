@@ -22,7 +22,7 @@ mod themes;
 
 pub mod keybindings;
 pub mod layers;
-pub mod migration;
+pub mod migration_15_16;
 pub mod shell_integration;
 pub mod ui;
 
